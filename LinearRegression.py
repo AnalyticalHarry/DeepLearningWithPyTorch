@@ -3,7 +3,7 @@ import torch
 import numpy as np
 import torch.nn as nn
 import matplotlib.pyplot as plt
-
+from sklearn.model_selection import KFold
 from torch.utils.data import random_split
 
 # generate random data
@@ -91,6 +91,16 @@ for epoch in range(num_epochs):
     if (epoch+1) % 5 == 0:
         print(f'Epoch [{epoch+1}/{num_epochs}], Training Loss: {train_loss.item():.4f}, Test Loss: {test_loss.item():.4f}')
 
+# loss plot
+plt.figure(figsize=(10, 5))
+plt.plot(train_loss_values, label='Training Loss')
+plt.plot(test_loss_values, label='Test Loss', linestyle='--')
+plt.xlabel('Epoch')
+plt.ylabel('Loss')
+plt.title('Training and Test Loss Over Time')
+plt.grid(True, ls='--', alpha=0.5, color='grey')
+plt.legend()
+plt.show()
 
 with torch.no_grad():
     # predictions for training and test set
@@ -112,10 +122,50 @@ with torch.no_grad():
     test_total_var = ((y_test - y_test.mean()) ** 2).sum()
     test_unexplained_var = ((y_test - y_test_pred) ** 2).sum()
     test_r_squared = 1 - test_unexplained_var / test_total_var
-
+    
 # final metrics for both train and test sets
 print(f'Final Train Metrics: MSE: {train_mse:.4f}, RMSE: {train_rmse:.4f}, MAE: {train_mae:.4f}, R^2: {train_r_squared:.4f}')
 print(f'Final Test Metrics: MSE: {test_mse:.4f}, RMSE: {test_rmse:.4f}, MAE: {test_mae:.4f}, R^2: {test_r_squared:.4f}')
+
+# five number of folds
+k = 5
+kf = KFold(n_splits=k)
+
+# R-squared for each fold
+train_r_squared_values = []
+test_r_squared_values = []
+
+for train_index, test_index in kf.split(X_tensor):
+    X_train_fold, X_test_fold = X_tensor[train_index], X_tensor[test_index]
+    y_train_fold, y_test_fold = y_tensor[train_index], y_tensor[test_index]
+    # predictions
+    y_train_pred_fold = model(X_train_fold)
+    y_test_pred_fold = model(X_test_fold)
+    # R-squared for train and test sets
+    train_total_var = ((y_train_fold - y_train_fold.mean()) ** 2).sum()
+    train_unexplained_var = ((y_train_fold - y_train_pred_fold) ** 2).sum()
+    train_r_squared = 1 - train_unexplained_var / train_total_var
+    train_r_squared_values.append(train_r_squared.item())
+    
+    test_total_var = ((y_test_fold - y_test_fold.mean()) ** 2).sum()
+    test_unexplained_var = ((y_test_fold - y_test_pred_fold) ** 2).sum()
+    test_r_squared = 1 - test_unexplained_var / test_total_var
+    test_r_squared_values.append(test_r_squared.item())
+
+print("Train R Square KFold: ")
+for i, j in enumerate(train_r_squared_values):
+    print(f'K Fold {i+1} : R Square {j:4f}')
+
+print("Test R Square KFold: ")
+for i, j in enumerate(test_r_squared_values):
+    print(f'K Fold {i+1} : R Square {j:4f}')
+
+# average R-squared across all folds
+avg_train_r_squared = np.mean(train_r_squared_values)
+avg_test_r_squared = np.mean(test_r_squared_values)
+
+print(f'Average Train R-squared: {avg_train_r_squared:.4f}')
+print(f'Average Test R-squared: {avg_test_r_squared:.4f}')
 
 # predictions 
 predicted = model(X_test).detach().numpy()
@@ -130,16 +180,7 @@ plt.grid(True, ls='--', alpha=0.2, color='grey')
 plt.legend()
 plt.show()
 
-# loss plot
-plt.figure(figsize=(10, 5))
-plt.plot(train_loss_values, label='Training Loss')
-plt.plot(test_loss_values, label='Test Loss', linestyle='--')
-plt.xlabel('Epoch')
-plt.ylabel('Loss')
-plt.title('Training and Test Loss Over Time')
-plt.grid(True, ls='--', alpha=0.5, color='grey')
-plt.legend()
-plt.show()
+
 
 ## Author : Hemant Thapa
 ## Topic : Linear regression using neural nets (pytorch)
