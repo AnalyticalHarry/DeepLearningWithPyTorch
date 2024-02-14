@@ -334,3 +334,7 @@ for i in range(20):
     data.append([f"Sample {i+1}", y_test[i], predictions[i]])
 
 print(tabulate(data, headers=["Sample", "True Value", "Predicted Value"], tablefmt="grid"))
+
+## Author : Hemant Thapa
+## Topic : MultiClassClassification neural nets (pytorch)
+## Date: 14.02.2024
