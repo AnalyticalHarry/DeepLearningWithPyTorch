@@ -388,7 +388,9 @@ print("Sample Predictions:")
 for i in range(10): 
     print(f"Sample {i+1}: Probability={probabilities[i][0]:.4f}, Prediction={binary_predictions[i]}")
 
-
+## Author : Hemant Thapa
+## Topic : Logistic regression using neural nets (pytorch)
+## Date: 14.02.2024
 
 
 
