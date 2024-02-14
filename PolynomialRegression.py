@@ -289,5 +289,5 @@ plt.tight_layout()
 plt.show()
 
 ## Author : Hemant Thapa
-## Topic : Logistic regression using neural nets (pytorch)
+## Topic : PolynomialRegressionusing neural nets (pytorch)
 ## Date: 14.02.2024
