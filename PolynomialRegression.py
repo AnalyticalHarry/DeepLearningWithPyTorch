@@ -290,4 +290,4 @@ plt.show()
 
 ## Author : Hemant Thapa
 ## Topic : PolynomialRegressionusing neural nets (pytorch)
-## Date: 14.02.2024
+## Date: 18.02.2024
